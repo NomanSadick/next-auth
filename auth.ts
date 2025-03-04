@@ -4,6 +4,8 @@ import LinkedInProvider from "next-auth/providers/linkedin";
 import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getUserByEmail } from "./src/data/user";
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import client from "./lib/mongoClinetPromise";
 
 export const {
   handlers: { GET, POST },
@@ -11,7 +13,7 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  // adapter: MongoDBAdapter(client),
+  adapter: MongoDBAdapter(client),
   session: {
     strategy: "jwt",
   },
