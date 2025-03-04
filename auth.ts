@@ -3,8 +3,6 @@ import GoogleProvider from "next-auth/providers/google";
 import LinkedInProvider from "next-auth/providers/linkedin";
 import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import client from "./lib/mongoClinetPromise";
 import { getUserByEmail } from "./src/data/user";
 
 export const {
