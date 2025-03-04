@@ -3,9 +3,12 @@ import GoogleProvider from "next-auth/providers/google";
 import LinkedInProvider from "next-auth/providers/linkedin";
 import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getUserByEmail } from "./src/data/user";
+// import { getUserByEmail } from "./src/data/user";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import client from "./lib/mongoClinetPromise";
+
+import { User } from "./model/user-model";
+import bcrypt from "bcryptjs";
 
 export const {
   handlers: { GET, POST },
@@ -27,10 +30,13 @@ export const {
         if (credentials === null) return null;
 
         try {
-          const user = getUserByEmail(credentials?.email as string);
+          const user = await User.findOne({ email: credentials?.email });
           console.log(user);
           if (user) {
-            const isMatch = user?.password === credentials.password;
+            const isMatch = await bcrypt.compare(
+              credentials.password as string,
+              user.password
+            );
 
             if (isMatch) {
               return user;
