@@ -1,39 +1,28 @@
+
 'use server'
 
 import { signIn, signOut } from "@/auth";
 
-// Google Sign In
-export async function doSignInGoogle() {
-    await signIn("google", { callbackUrl: "http://localhost:3000" });
+export async function doSocialLogin(formData) {
+    const action = formData.get('action');
+    await signIn(action, { redirectTo: "/home" });
 }
 
-// LinkedIn Sign In
-export async function doSignInLinkedIn() {
-    await signIn("linkedin", { callbackUrl: "http://localhost:3000" });
+export async function doLogout() {
+  await signOut({ redirectTo: "/" });
 }
 
-// Facebook Sign In
-export async function doSignInFacebook() {
-    await signIn("facebook", { callbackUrl: "http://localhost:3000" });
+export async function doCredentialLogin(formData) {
+  console.log("formData", formData);
+
+  try {
+    const response = await signIn("credentials", {
+      email: formData.get("email"),
+      password: formData.get("password"),
+      redirect: false,
+    });
+    return response;
+  } catch (err) {
+    throw err;
+  }
 }
-
-// Sign Out
-export async function doSignOut() {
-    await signOut();
-}
-
-
-
-
-// export async function login(formData) {
-//     try {
-//       const response = await signIn("credentials", {
-//         email: formData.get("email"),
-//         password: formData.get("password"),
-//         redirect: false,
-//       });
-//       return response;
-//     } catch (err) {
-//       throw err;
-//     }
-//   }

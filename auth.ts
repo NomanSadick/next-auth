@@ -2,10 +2,10 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import LinkedInProvider from "next-auth/providers/linkedin";
 import FacebookProvider from "next-auth/providers/facebook";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import client from "./lib/mongoClinetPromise";
-
-
+import { getUserByEmail } from "./src/data/user";
 
 export const {
   handlers: { GET, POST },
@@ -13,12 +13,38 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-    // adapter: MongoDBAdapter(client),
-    // session: {
-    //   strategy: 'jwt',
-    // },
+  // adapter: MongoDBAdapter(client),
+  session: {
+    strategy: "jwt",
+  },
   providers: [
-    
+    CredentialsProvider({
+      credentials: {
+        email: {},
+        password: {},
+      },
+      async authorize(credentials) {
+        if (credentials === null) return null;
+
+        try {
+          const user = getUserByEmail(credentials?.email as string);
+          console.log(user);
+          if (user) {
+            const isMatch = user?.password === credentials.password;
+
+            if (isMatch) {
+              return user;
+            } else {
+              throw new Error("Email or Password is not correct");
+            }
+          } else {
+            throw new Error("User not found");
+          }
+        } catch (error) {
+          throw new Error(error);
+        }
+      },
+    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
